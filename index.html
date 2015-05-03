@@ -9,21 +9,21 @@
 
   <body>
 
-    <script src = "lib/three.min.js"                ></script>
-    <script src = "lib/jquery.min.js"               ></script>
-    <script src = "lib/ShaderLoader.js"             ></script>
+    <script src = "lib/three.min.js"></script>
+    <script src = "lib/jquery.min.js"></script>
+    <script src = "lib/ShaderLoader.js"></script>
 
-    <script src = "lib/TrackballControls.js"        ></script>
-      
+    <script src = "lib/TrackballControls.js"></script>
 
-    <script src = "Audio.js"                        ></script>
+
+    <script src = "Audio.js"></script>
 
 
     <script>
 
 
       var camera, renderer, scene , controls;
-      
+
       var audioMesh;
 
       var shaders = new ShaderLoader( 'shaders' );
@@ -39,13 +39,26 @@
       var audio = new Audio();
 
       var uniforms = {
-  
-        t_audio: { type:"t"  , value: audio.texture }
+
+        t_audio: { type:"t"  , value: audio.texture },
+        xScale:  { type:"f", value: 1.0},
+        yScale:  { type:"f", value: 1.0},
+        zScale:  { type:"f", value: 1.0}
 
       }
 
+      var ballUniforms = {
 
-      navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+        t_audio: { type:"t"  , value: audio.texture },
+        xScale:  { type:"f", value: 2.0},
+        yScale:  { type:"f", value: 0.0},
+        zScale:  { type:"f", value: 0.0}
+
+      }
+
+      navigator.getUserMedia = navigator.getUserMedia
+                                || navigator.webkitGetUserMedia
+                                || navigator.mozGetUserMedia;
 
       var constraints = {
         audio: true,
@@ -61,7 +74,7 @@
         var w = window.innerWidth;
         var h = window.innerHeight;
 
-        camera = new THREE.PerspectiveCamera( 65 , w/h , .001 , 4 );
+        camera = new THREE.PerspectiveCamera( 65 , w/h , .001 , 1000 );
         camera.position.z = 2;
        // camera.position.y = -.4;
 
@@ -84,20 +97,46 @@
 
         var mat = new THREE.ShaderMaterial({
 
+          uniforms: ballUniforms,
+          vertexShader: shaders.vs.audio,
+          fragmentShader: shaders.fs.audio,
+
+        });
+
+        audioMesh = new THREE.Mesh( geo , mat );
+
+        scene.add( audioMesh );
+
+        audioMesh.position.set(-2, 0, 0);
+
+        var audioMesh3 = new THREE.Mesh(geo, mat);
+
+        scene.add(audioMesh3);
+
+        audioMesh3.position.set(2.5, 0, 0);
+
+
+
+        var rect = new THREE.TorusKnotGeometry( 1, .2, 300, 300 );
+        //var mat = new THREE.MeshBasicMaterial( { color: 0xffff00, side: THREE.DoubleSide } );
+
+        var mat = new THREE.ShaderMaterial({
+
           uniforms: uniforms,
           vertexShader: shaders.vs.audio,
           fragmentShader: shaders.fs.audio,
 
-        }); 
+        });
 
-        audioMesh = new THREE.Mesh( geo , mat );
- 
-        scene.add( audioMesh ); 
+
+        var audioMesh2 = new THREE.Mesh( rect , mat );
+
+        scene.add( audioMesh2 );
 
 
       }
 
-      
+
       function animate(){
 
         requestAnimationFrame( animate );
